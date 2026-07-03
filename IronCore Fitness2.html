@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IronCore Fitness2 | Train Hard. Stay Strong.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Bebas+Neue&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ========== GLOBAL VARIABLES & RESET ========== */
+    :root {
+      --primary: #E63946;
+      --primary-dark: #C1121F;
+      --secondary: #FFD60A;
+      --bg: #050505;
+      --card: #121212;
+      --accent: #00E5FF;
+      --text: #FFFFFF;
+      --text-dim: #9CA3AF;
+      --success: #22C55E;
+      --glass-bg: rgba(18, 18, 18, 0.75);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --radius-xl: 30px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --shadow-glow: 0 0 30px rgba(230, 57, 70, 0.5);
+      --shadow-neon: 0 0 20px rgba(255, 214, 10, 0.7);
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-head: 'Bebas Neue', cursive;
+      --font-body: 'Poppins', sans-serif;
+      --font-dash: 'Montserrat', sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      cursor: default;
+    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #1A1A1A; }
+    ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+    /* ========== PARTICLES CANVAS ========== */
+    #particles-canvas {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+    }
+
+    /* ========== PAGE LOADER ========== */
+    .page-loader {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--bg); z-index: 99999;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; transition: opacity 0.5s, visibility 0.5s;
+    }
+    .page-loader.hidden { opacity: 0; visibility: hidden; }
+    .loader-dumbbell {
+      font-size: 5rem; animation: liftDumbbell 1s infinite alternate;
+    }
+    @keyframes liftDumbbell {
+      from { transform: translateY(0) rotate(0deg); }
+      to { transform: translateY(-20px) rotate(10deg); }
+    }
+
+    /* ========== MAIN APP ========== */
+    .app { position: relative; z-index: 1; }
+    .page {
+      display: none; min-height: 100vh;
+      padding: 20px 24px 40px; animation: fadeSlide 0.5s ease;
+    }
+    .page.active { display: block; }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(25px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .container { max-width: 1300px; margin: 0 auto; }
+
+    /* ========== GLASS NAVBAR ========== */
+    .navbar {
+      position: sticky; top: 0; z-index: 1000;
+      background: rgba(5,5,5,0.8); backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,214,10,0.15);
+      padding: 0 24px;
+    }
+    .navbar-inner {
+      max-width: 1300px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 70px;
+    }
+    .nav-brand {
+      font-family: var(--font-head); font-size: 2.2rem; letter-spacing: 2px;
+      background: linear-gradient(135deg, #FFD60A, #E63946);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      cursor: pointer;
+    }
+    .nav-links {
+      display: flex; list-style: none; gap: 8px; align-items: center;
+    }
+    .nav-links a {
+      color: var(--text); text-decoration: none; font-weight: 500;
+      padding: 8px 16px; border-radius: 30px; transition: var(--transition);
+      cursor: pointer; font-size: 0.9rem; font-family: var(--font-body);
+    }
+    .nav-links a:hover, .nav-links a.active {
+      background: rgba(230,57,70,0.15); box-shadow: 0 0 12px rgba(230,57,70,0.4);
+    }
+    .hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; }
+    .hamburger span { width: 26px; height: 3px; background: white; border-radius: 3px; }
+
+    /* ========== BUTTONS ========== */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 32px; border-radius: 50px; font-weight: 600;
+      font-size: 0.95rem; border: none; cursor: pointer; transition: all 0.3s;
+      background: linear-gradient(135deg, #E63946, #FFD60A);
+      color: #050505; box-shadow: 0 6px 20px rgba(230,57,70,0.5);
+    }
+    .btn:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(230,57,70,0.8); }
+    .btn-outline {
+      background: transparent; border: 2px solid var(--primary); color: var(--primary);
+      box-shadow: none;
+    }
+    .btn-accent {
+      background: linear-gradient(135deg, #00E5FF, #22C55E);
+    }
+
+    /* ========== GLASS CARD ========== */
+    .glass-card {
+      background: var(--glass-bg); backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius-lg);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5); padding: 28px; transition: var(--transition);
+    }
+    .glass-card:hover { box-shadow: 0 0 35px rgba(230,57,70,0.25); }
+
+    /* ========== HERO ========== */
+    .hero {
+      position: relative; min-height: 90vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; flex-direction: column;
+      background: radial-gradient(circle at 30% 40%, #E63946 0%, #050505 70%);
+    }
+    .hero h1 {
+      font-family: var(--font-head); font-size: 5rem; letter-spacing: 4px;
+      background: linear-gradient(to right, #FFD60A, #E63946);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-sub { font-size: 1.3rem; color: var(--text-dim); margin: 16px 0 32px; }
+
+    /* ========== MEMBERSHIP PLANS ========== */
+    .plans-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px; margin: 30px 0;
+    }
+    .plan-card {
+      background: var(--card); border-radius: var(--radius-lg);
+      padding: 30px; text-align: center; border: 2px solid transparent;
+      transition: all 0.4s; cursor: pointer; position: relative; overflow: hidden;
+    }
+    .plan-card:hover, .plan-card.selected {
+      border-color: var(--secondary); box-shadow: 0 0 30px rgba(255,214,10,0.5);
+      transform: translateY(-8px);
+    }
+    .plan-badge { position: absolute; top: 15px; right: 15px; background: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+
+    /* ========== 3D TILT CARDS ========== */
+    .tilt-card { transform-style: preserve-3d; perspective: 1000px; }
+    .tilt-card-inner { transition: transform 0.2s ease; }
+
+    /* ========== IMAGE UPLOAD PREVIEW ========== */
+    .photo-upload { width: 120px; height: 120px; border-radius: 50%; border: 2px dashed var(--primary); display: flex; align-items: center; justify-content: center; cursor: pointer; margin: 0 auto; background-size: cover; background-position: center; }
+
+    /* ========== GYM ID CARD FLIP ========== */
+    .id-card-container { perspective: 1500px; width: 400px; margin: 30px auto; }
+    .id-card-flip {
+      width: 100%; height: 250px; position: relative; transition: transform 0.8s; transform-style: preserve-3d; cursor: pointer;
+    }
+    .id-card-flip.flipped { transform: rotateY(180deg); }
+    .id-card-front, .id-card-back {
+      position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+      border-radius: 20px; overflow: hidden;
+    }
+    .id-card-front { background: linear-gradient(145deg, #1A1A1A, #0F0F0F); border: 2px solid #FFD60A; display: flex; padding: 20px; }
+    .id-card-back { background: linear-gradient(145deg, #E63946, #C1121F); border: 2px solid #FFD60A; transform: rotateY(180deg); display: flex; align-items: center; justify-content: center; flex-direction: column; }
+
+    /* ========== FORMS ========== */
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 14px 16px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-sm); color: white; font-family: inherit;
+      transition: var(--transition);
+    }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 12px rgba(230,57,70,0.4); }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      .hamburger { display: flex; }
+      .nav-links {
+        position: fixed; top: 0; right: -100%; width: 260px; height: 100vh;
+        background: rgba(10,10,10,0.97); backdrop-filter: blur(30px);
+        flex-direction: column; padding: 80px 20px; transition: 0.4s; z-index: 999;
+      }
+      .nav-links.open { right: 0; }
+      .hero h1 { font-size: 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Page Loader -->
+  <div class="page-loader" id="pageLoader"><span class="loader-dumbbell">🏋️</span></div>
+  <!-- Particles -->
+  <canvas id="particles-canvas"></canvas>
+
+  <div class="app">
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <div class="navbar-inner">
+        <div class="nav-brand" onclick="navigateTo('home')">IRONCORE FITNESS2</div>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+        <ul class="nav-links" id="navLinks">
+          <li><a onclick="navigateTo('home')" class="active" data-page="home">Home</a></li>
+          <li><a onclick="navigateTo('membership')" data-page="membership">Plans</a></li>
+          <li><a onclick="navigateTo('training')" data-page="training">Training</a></li>
+          <li><a onclick="navigateTo('admission')" data-page="admission">Join</a></li>
+          <li><a onclick="navigateTo('dashboard')" data-page="dashboard">Dashboard</a></li>
+          <li><a onclick="navigateTo('login')" class="btn btn-sm" style="background:#E63946; color:white;">Login</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- ==================== PAGES ==================== -->
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="hero">
+        <h1>TRAIN HARD.<br>STAY STRONG.</h1>
+        <p class="hero-sub">Premium gym membership & training management</p>
+        <button class="btn btn-accent" onclick="navigateTo('membership')">🚀 Get Started</button>
+      </div>
+      <div class="container">
+        <div class="glass-card" style="margin-top:-80px; position:relative; display:flex; justify-content:space-around; flex-wrap:wrap;">
+          <div><span style="font-size:2.5rem; font-weight:800; color:#FFD60A;">5000+</span><p>Active Members</p></div>
+          <div><span style="font-size:2.5rem; font-weight:800; color:#FFD60A;">50+</span><p>Expert Trainers</p></div>
+          <div><span style="font-size:2.5rem; font-weight:800; color:#FFD60A;">20+</span><p>Years Experience</p></div>
+        </div>
+        <h2 style="font-family:var(--font-head); margin-top:50px; font-size:2.5rem;">🏆 WHY IRONCORE?</h2>
+        <div class="plans-grid">
+          <div class="glass-card">💪 Premium Equipment</div>
+          <div class="glass-card">🧑‍🏫 Certified Trainers</div>
+          <div class="glass-card">📊 Progress Tracking</div>
+          <div class="glass-card">🥗 Nutrition Plans</div>
+        </div>
+        <h2 style="font-family:var(--font-head); margin-top:40px;">🗣️ TESTIMONIALS</h2>
+        <div style="display:flex; gap:20px; overflow-x:auto;">
+          <div class="glass-card" style="min-width:280px;">"Life changing experience!" – Rahul</div>
+          <div class="glass-card" style="min-width:280px;">"Best trainers in town." – Priya</div>
+        </div>
+        <div class="glass-card" style="margin-top:30px; text-align:center;">
+          <h3>BMI Calculator</h3>
+          <input type="number" id="weight" placeholder="Weight (kg)" style="padding:10px; margin:5px;">
+          <input type="number" id="height" placeholder="Height (cm)" style="padding:10px;">
+          <button class="btn btn-sm" onclick="calcBMI()">Calculate</button>
+          <p id="bmiResult"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div class="page" id="page-login">
+      <div class="container glass-card" style="max-width:450px; margin:60px auto;">
+        <h2 style="text-align:center;">🔐 LOGIN</h2>
+        <div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px;">
+          <button class="btn btn-sm" onclick="setLoginType('member')">Member</button>
+          <button class="btn btn-sm" onclick="setLoginType('trainer')">Trainer</button>
+          <button class="btn btn-sm" onclick="setLoginType('admin')">Admin</button>
+        </div>
+        <div class="form-group"><input type="email" id="loginEmail" placeholder="Email"></div>
+        <div class="form-group"><input type="password" id="loginPassword" placeholder="Password"></div>
+        <button class="btn" style="width:100%;" onclick="handleLogin()">Login</button>
+        <p style="margin-top:12px;">New? <a onclick="navigateTo('register')" style="color:var(--primary);">Register</a></p>
+      </div>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="page" id="page-register">
+      <div class="container glass-card" style="max-width:600px; margin:40px auto;">
+        <h2>📝 REGISTER</h2>
+        <div class="form-group"><input placeholder="Full Name" id="regName"></div>
+        <div class="form-group"><input type="date" id="regDob"></div>
+        <div class="form-group"><select><option>Gender</option><option>Male</option><option>Female</option></select></div>
+        <div class="form-group"><input placeholder="Mobile"></div>
+        <div class="form-group"><input type="email" placeholder="Email"></div>
+        <div class="form-group"><input placeholder="Height (cm)"></div>
+        <div class="form-group"><input placeholder="Weight (kg)"></div>
+        <div class="form-group"><input placeholder="Emergency Contact"></div>
+        <div class="form-group"><input type="password" placeholder="Password"></div>
+        <button class="btn" style="width:100%;" onclick="navigateTo('login')">Register</button>
+      </div>
+    </div>
+
+    <!-- MEMBERSHIP PLANS -->
+    <div class="page" id="page-membership">
+      <div class="container">
+        <h2 style="font-family:var(--font-head); font-size:2.8rem;">💳 MEMBERSHIP PLANS</h2>
+        <div class="plans-grid">
+          <div class="plan-card" data-plan="basic" onclick="selectPlan('basic')">
+            <div class="plan-badge">SAVE</div><h3>🥉 BASIC</h3><h2>₹999</h2>/month
+          </div>
+          <div class="plan-card" data-plan="standard" onclick="selectPlan('standard')">
+            <h3>🥈 STANDARD</h3><h2>₹1999</h2>/month
+          </div>
+          <div class="plan-card" data-plan="premium" onclick="selectPlan('premium')">
+            <h3>🥇 PREMIUM</h3><h2>₹2999</h2>/month
+          </div>
+          <div class="plan-card" data-plan="elite" onclick="selectPlan('elite')">
+            <h3>💎 ELITE</h3><h2>₹4999</h2>/month
+          </div>
+        </div>
+        <button class="btn btn-accent" onclick="navigateTo('admission')" style="margin-top:20px;">Proceed to Admission</button>
+      </div>
+    </div>
+
+    <!-- TRAINING PROGRAMS -->
+    <div class="page" id="page-training">
+      <div class="container">
+        <h2 style="font-family:var(--font-head);">🏋️ TRAINING PROGRAMS</h2>
+        <div class="grid-3d" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:20px;" id="trainingGrid"></div>
+      </div>
+    </div>
+
+    <!-- ADMISSION PORTAL -->
+    <div class="page" id="page-admission">
+      <div class="container glass-card" style="max-width:800px; margin:30px auto;">
+        <h2>📋 ADMISSION FORM</h2>
+        <div class="form-group"><input placeholder="Full Name" id="admName"></div>
+        <div class="form-group"><input type="date" id="admDob"></div>
+        <div class="form-group"><select><option>Gender</option><option>Male</option><option>Female</option></select></div>
+        <div class="form-group"><input placeholder="Mobile"></div>
+        <div class="form-group"><input type="email" placeholder="Email"></div>
+        <div class="form-group"><input placeholder="Address"></div>
+        <div class="form-group"><input placeholder="Emergency Contact"></div>
+        <div class="form-group"><label>Medical Declaration</label><textarea rows="3">I declare I am fit for exercise.</textarea></div>
+        <div class="form-group"><label>Upload Photo</label><input type="file" id="photoUpload" accept="image/*" onchange="previewPhoto()"></div>
+        <div class="photo-upload" id="photoPreview" onclick="document.getElementById('photoUpload').click()">+</div>
+        <div class="form-group"><label>Selected Plan: <span id="selectedPlanDisplay">None</span></label></div>
+        <div class="form-group"><label>Training Program</label><select id="trainingSelect"></select></div>
+        <label><input type="checkbox" id="termsCheck"> I accept Terms & Conditions</label>
+        <button class="btn btn-accent" style="width:100%; margin-top:15px;" onclick="submitAdmission()">Submit & Pay</button>
+      </div>
+    </div>
+
+    <!-- PAYMENT PORTAL -->
+    <div class="page" id="page-payment">
+      <div class="container glass-card" style="max-width:450px; margin:60px auto; text-align:center;">
+        <h2>💳 PAYMENT</h2>
+        <p>Amount: ₹<span id="payAmount">0</span></p>
+        <div><button class="btn" onclick="processPayment('UPI')">UPI</button></div>
+        <div><button class="btn" onclick="processPayment('Card')">Card</button></div>
+        <div><button class="btn" onclick="processPayment('NetBanking')">Net Banking</button></div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page" id="page-dashboard">
+      <div class="container">
+        <h2 style="font-family:var(--font-head);">📊 MEMBER DASHBOARD</h2>
+        <div class="grid-3d" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:20px;">
+          <div class="glass-card" onclick="navigateTo('idcard')">🆔 Gym ID Card</div>
+          <div class="glass-card">📅 Training Schedule</div>
+          <div class="glass-card">📈 Progress</div>
+          <div class="glass-card">💰 Payments</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEMBER RECORDS -->
+    <div class="page" id="page-records">
+      <div class="container">
+        <h2>📋 MEMBER RECORDS</h2>
+        <input placeholder="Search by name or ID" style="padding:12px; width:100%; background:#1A1A1A; border:none; color:white; border-radius:20px;">
+        <div class="glass-card" style="margin-top:20px; overflow-x:auto;">
+          <table style="width:100%;">
+            <tr><th>ID</th><th>Name</th><th>Plan</th><th>Join Date</th></tr>
+            <tr><td>#GYM001</td><td>Raj Gautam</td><td>Premium</td><td>2024-01-15</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- GYM ID CARD -->
+    <div class="page" id="page-idcard">
+      <div class="container" style="text-align:center;">
+        <h2 style="font-family:var(--font-head);">🏅 GYM ID CARD</h2>
+        <div class="id-card-container">
+          <div class="id-card-flip" id="idCardFlip" onclick="this.classList.toggle('flipped')">
+            <div class="id-card-front">
+              <div style="display:flex; gap:15px;">
+                <div id="idPhotoDisplay" style="width:80px; height:80px; border-radius:50%; background-size:cover; background-position:center; border:2px solid #FFD60A;"></div>
+                <div>
+                  <h3 id="idName">Raj Gautam</h3>
+                  <p>ID: #GYM001</p>
+                  <p>Plan: <span id="idPlan">Premium</span></p>
+                </div>
+              </div>
+              <div style="margin-top:auto;">QR: <div style="width:60px;height:60px;background:white;display:inline-block;"></div></div>
+            </div>
+            <div class="id-card-back">
+              <h3>IRONCORE FITNESS</h3>
+              <p>Emergency: 9876543210</p>
+              <p>Valid Till: <span id="idExpiry">2025-01-15</span></p>
+            </div>
+          </div>
+        </div>
+        <button class="btn" onclick="window.print()">🖨️ Print / Download</button>
+      </div>
+    </div>
+
+    <!-- ABOUT DEVELOPER -->
+    <div class="page" id="page-about">
+      <div class="container glass-card" style="max-width:600px; margin:40px auto; text-align:center;">
+        <h2>👨‍💻 ABOUT DEVELOPER</h2>
+        <h3>Raj Gautam</h3>
+        <p>BCA Student | UI/UX Designer | Frontend Developer | Cyber Security Enthusiast</p>
+        <p>📧 raj@example.com | 🌐 portfolio.com</p>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="page" id="page-contact">
+      <div class="container glass-card" style="max-width:500px; margin:40px auto;">
+        <h2>📞 CONTACT</h2>
+        <div class="form-group"><input placeholder="Name"></div>
+        <div class="form-group"><input placeholder="Email"></div>
+        <div class="form-group"><textarea placeholder="Message"></textarea></div>
+        <button class="btn">Send</button>
+      </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD (simple) -->
+    <div class="page" id="page-admin">
+      <div class="container">
+        <h2>🛡️ ADMIN DASHBOARD</h2>
+        <div class="grid-3d" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:20px;">
+          <div class="glass-card">Total Members: 350</div>
+          <div class="glass-card">Revenue: ₹2.5L</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ---------- PARTICLES ----------
+      const canvas = document.getElementById('particles-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      window.addEventListener('resize', resizeCanvas); resizeCanvas();
+      class Particle {
+        constructor() { this.reset(); }
+        reset() { this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height; this.size = Math.random()*2+1; this.speed = 0.3+Math.random()*0.5; }
+        update() { this.y -= this.speed; if(this.y<0){ this.y=canvas.height; this.x=Math.random()*canvas.width; } }
+        draw() { ctx.fillStyle='rgba(255,214,10,0.6)'; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill(); }
+      }
+      for(let i=0;i<100;i++) particles.push(new Particle());
+      function animateParticles() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{ p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
+      animateParticles();
+
+      // ---------- LOADER ----------
+      window.addEventListener('load', () => { setTimeout(() => document.getElementById('pageLoader').classList.add('hidden'), 700); });
+
+      // ---------- GLOBAL STATE ----------
+      let selectedPlan = 'basic';
+      let admissionData = {};
+      let loggedInUser = null;
+
+      // ---------- NAVIGATION ----------
+      window.navigateTo = function(page) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const target = document.getElementById('page-' + page);
+        if (target) target.classList.add('active');
+        document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.classList.remove('active'));
+        const link = document.querySelector(`.nav-links a[data-page="${page}"]`);
+        if (link) link.classList.add('active');
+        window.scrollTo(0,0);
+        document.getElementById('navLinks').classList.remove('open');
+        if (page === 'admission') updateAdmissionPage();
+        if (page === 'payment') updatePayAmount();
+        if (page === 'idcard') renderIDCard();
+        if (page === 'training') populateTraining();
+      };
+
+      document.getElementById('hamburger').addEventListener('click', ()=> document.getElementById('navLinks').classList.toggle('open'));
+
+      // ---------- MEMBERSHIP PLAN ----------
+      window.selectPlan = function(plan) {
+        selectedPlan = plan;
+        document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+        document.querySelector(`.plan-card[data-plan="${plan}"]`).classList.add('selected');
+        document.getElementById('selectedPlanDisplay').textContent = plan.toUpperCase();
+      };
+
+      // ---------- TRAINING GRID ----------
+      const programs = ['Weight Training','Cardio','Powerlifting','CrossFit','Functional Training','Yoga','Zumba','HIIT','Boxing Fitness','Personal Training','Strength Training','Fat Loss Program'];
+      function populateTraining() {
+        const grid = document.getElementById('trainingGrid');
+        if (grid) grid.innerHTML = programs.map(p => `<div class="glass-card tilt-card"><h4>${p}</h4><button class="btn btn-sm">Join</button></div>`).join('');
+      }
+      function updateAdmissionPage() {
+        document.getElementById('selectedPlanDisplay').textContent = selectedPlan.toUpperCase();
+        const select = document.getElementById('trainingSelect');
+        select.innerHTML = programs.map(p => `<option>${p}</option>`).join('');
+      }
+
+      // ---------- ADMISSION & PAYMENT FLOW ----------
+      window.submitAdmission = function() {
+        if (!document.getElementById('termsCheck').checked) { alert('Accept terms'); return; }
+        const name = document.getElementById('admName').value || 'Raj Gautam';
+        admissionData = {
+          name: name,
+          plan: selectedPlan,
+          photo: document.getElementById('photoPreview').style.backgroundImage || '',
+          joinDate: new Date().toISOString().split('T')[0],
+          expiry: new Date(new Date().setFullYear(new Date().getFullYear()+1)).toISOString().split('T')[0]
+        };
+        document.getElementById('payAmount').textContent = {basic:999,standard:1999,premium:2999,elite:4999}[selectedPlan] || 999;
+        navigateTo('payment');
+      };
+
+      function updatePayAmount() {
+        document.getElementById('payAmount').textContent = {basic:999,standard:1999,premium:2999,elite:4999}[selectedPlan] || 999;
+      }
+
+      window.processPayment = function(method) {
+        alert(`Payment via ${method} successful!`);
+        navigateTo('idcard');
+      };
+
+      // ---------- PHOTO UPLOAD PREVIEW ----------
+      window.previewPhoto = function() {
+        const file = document.getElementById('photoUpload').files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = e => document.getElementById('photoPreview').style.backgroundImage = `url(${e.target.result})`;
+          reader.readAsDataURL(file);
+        }
+      };
+
+      // ---------- ID CARD RENDERING ----------
+      function renderIDCard() {
+        document.getElementById('idName').textContent = admissionData.name || 'Raj Gautam';
+        document.getElementById('idPlan').textContent = (admissionData.plan || 'premium').toUpperCase();
+        document.getElementById('idExpiry').textContent = admissionData.expiry || '2025-01-15';
+        const photoDisplay = document.getElementById('idPhotoDisplay');
+        if (admissionData.photo) photoDisplay.style.backgroundImage = admissionData.photo;
+        else photoDisplay.style.background = '#333';
+      }
+
+      // ---------- LOGIN ----------
+      window.setLoginType = function(type) { window.loginType = type; };
+      window.handleLogin = function() {
+        const email = document.getElementById('loginEmail').value;
+        if (email) {
+          loggedInUser = { email };
+          if (window.loginType === 'admin') navigateTo('admin');
+          else navigateTo('dashboard');
+        } else alert('Enter email');
+      };
+
+      // ---------- BMI CALC ----------
+      window.calcBMI = function() {
+        const w = parseFloat(document.getElementById('weight').value);
+        const h = parseFloat(document.getElementById('height').value)/100;
+        if(w && h) {
+          const bmi = (w/(h*h)).toFixed(1);
+          document.getElementById('bmiResult').textContent = `Your BMI: ${bmi}`;
+        }
+      };
+
+      // 3D Tilt
+      document.addEventListener('mouseover', function(e) {
+        const card = e.target.closest('.tilt-card');
+        if (!card) return;
+        card.addEventListener('mousemove', function(e) {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.transform = `perspective(600px) rotateX(${(y-rect.height/2)/8}deg) rotateY(${(rect.width/2-x)/8}deg)`;
+        });
+        card.addEventListener('mouseleave', function() { card.style.transform = ''; });
+      });
+
+      // Initial setup
+      document.querySelector('.plan-card[data-plan="basic"]').classList.add('selected');
+      populateTraining();
+    })();
+  </script>
+</body>
+</html>
